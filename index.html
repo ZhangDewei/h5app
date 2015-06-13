@@ -6,11 +6,65 @@
     <title></title>
     <script src="js/mui.min.js"></script>
     <link href="css/mui.min.css" rel="stylesheet"/>
-    <script type="text/javascript" charset="utf-8">
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=lPGg2RGMsPVXQPog9fOyBa4G"></script>
+	<title>地图展示</title>
+	<script type="text/javascript" charset="utf-8">
       	mui.init();
     </script>
 </head>
 <body>
-	
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">选择景点</h1>
+	</header>
+	<div class="mui-input-row">
+		<label>城市</label>
+		<select name="city">
+			<option value=""></option>
+		</select>
+	</div>
+	<div id="allmap" style="height: 40%;"></div>
+	<div class="mui-card">
+		<label>您选择的景点：</label>
+		<ul id="list">
+		</ul>
+	</div>
 </body>
 </html>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap", {enableMapClick:false});    // 创建Map实例
+	map.centerAndZoom("西安", 11);  // 初始化地图,设置中心点坐标和地图级别
+	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	var selectedList={};
+	var local = new BMap.LocalSearch(map, {
+		renderOptions:{map: map},
+		onMarkersSet:function (pois) {
+			var poisInfo={};
+			for (var i = 0; i < pois.length; i++) {
+				poisInfo[pois[i].title]=pois[i];
+				pois[i].marker.addEventListener("click", function(e){          
+					//
+					var title=e.currentTarget.z.title;
+					if (!selectedList[title]) {
+						selectedList[title]=poisInfo[title];
+						var liEl=document.createElement("li");
+						liEl.textContent=title;
+						var list=document.getElementById("list");
+						list.appendChild(liEl);
+						console.log(selectedList);
+					} else{
+						
+					}
+					//map.openInfoWindow(infoWindow,point); //开启信息窗口
+				});
+			}
+		}
+	});
+	local.search("景点");
+	var start="华清池";
+	var end="陕西翠华山国家地质公园";
+	var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+	driving.search(start,end);
+</script>
